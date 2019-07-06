@@ -6,55 +6,122 @@
 //#include <unistd.h>
 
 Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
-    int *v = (int*)malloc(sizeof(int)*dimension);
+    //int *v = (int*)malloc(sizeof(int)*dimension);
     int distancia;
-    for(int i = 0; i < dimension; i++) {
-        v[i] = i;
-        distancia = distancia + i;
-    }
+//     for(int i = 0; i < dimension; i++) {
+//         v[i] = i;
+//         distancia = distancia + i;
+//     }
     int tamPopulacao = dimension / 5;
     Solucao *sol = populacaoInicial( dimension, edgeSection );
 
     int numMutacoes = 0;
-    
-    
-    while( numMutacoes == 3000 ) {
+    int cont = 0;
+    int melhor = 9999999;
+    while( cont < 99999999 ) {
         int *paisIndx = buscaMelhoresFitness( sol, tamPopulacao );
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
-        int *p1 = sol[indxP1].cidades;
-        int *p2 = sol[indxP2].cidades;
-        mutacao( p1, p2);
-        
-        
-        
-        numMutacoes++;
-    }
-    
-    for( int i = 0; i < tamPopulacao; i++ ) {
-        printf("Elemento %d\n=>Cidades: ", i); 
-        for( int t = 0; t < dimension; t++ ) {
-            printf("%d ", sol[i].cidades[t]); 
+        crossover( sol[indxP1].cidades, sol[indxP2].cidades, dimension);
+        mutacao( sol[indxP1].cidades, dimension );
+        mutacao( sol[indxP2].cidades, dimension );
+        sol[indxP1].distancia = calculaDistancia(sol[indxP1].cidades, edgeSection, dimension);
+        sol[indxP2].distancia = calculaDistancia(sol[indxP2].cidades, edgeSection, dimension);
+        if( melhor > sol[indxP1].distancia ) {
+            melhor = sol[indxP1].distancia;
+            printf("\nDistancia: %d\n", melhor);
         }
-        printf("\nDistancia: %d\n\n", sol[i].distancia);
-    }    
-
+        if( melhor > sol[indxP2].distancia ) {
+            melhor = sol[indxP2].distancia;
+            printf("\nDistancia: %d\n", melhor);
+        }
+        cont++;
+    }
     return sol;
 }
 
-void mutacao( int *p1, int *p2 ) {
-    
+double fitnessFunction( int distancia ) { 
+    return 1/distancia;
 }
+
+void crossover( int *p1, int *p2, int dimension ) {  
+    srand(time(0));
+    int crossoverPoint = rand() % dimension/5;
+    int *intervaloP1 = (int*)malloc(sizeof(int)*crossoverPoint);
+    int *intervaloP2 = (int*)malloc(sizeof(int)*crossoverPoint);
+    for( int i = 0; i < crossoverPoint; i++ ) {
+        intervaloP1[i] =  p1[i];
+        intervaloP2[i] =  p2[i];
+    }
+//     printf("Iniciando crossover( crossoverPoint = %d)\n", crossoverPoint);
+//     printf("p1: ");
+//     for( int t = 0; t < dimension; t++ ) {
+//         printf("%d ", p1[t]); 
+//     }
+//     printf("\nIntervalorP1: ");
+//     for( int i = 0; i < crossoverPoint; i++ ) {
+//         printf("%d ", intervaloP1[i]);
+//     }
+//     printf("\np2: ");
+//     for( int t = 0; t < dimension; t++ ) {
+//         printf("%d ", p2[t]); 
+//     }
+//     printf("\nIntervalorP2: ");
+//     for( int i = 0; i < crossoverPoint; i++ ) {
+//         printf("%d ", intervaloP2[i]);
+//     }
+//     printf("\n\n\n");
+    for( int i = 0; i < crossoverPoint; i++ ) {
+        int pos;
+        for( int t = 0; t < dimension; t++ ) {
+            if( p1[t] == intervaloP2[i] ) {
+                p1[t] = p1[i];
+            }
+            if( p2[t] == intervaloP1[i] ) {
+                p2[t] = p2[i];
+            }
+        }
+        p1[i] = intervaloP2[i];
+        p2[i] = intervaloP1[i];
+    }
+    free(intervaloP1);
+    free(intervaloP2);
+}
+// Reverse Sequence Mutation
+void mutacao( int *p1, int dimension ) {
+    srand(time(0));
+    int mutationPoint1 = rand() % (dimension/2);
+    int mutationPoint2 = (dimension-1) - mutationPoint1;
+    int auxMutation1 = mutationPoint1;
+    int auxMutation2 = mutationPoint2;
+    for( int i = 0; i <= (mutationPoint2 - mutationPoint1)/2 ; i++ ) {
+        int aux = p1[auxMutation1];
+        p1[auxMutation1] = p1[auxMutation2];
+        p1[auxMutation2] = aux;
+        auxMutation1++;
+        auxMutation2--;
+    }
+
+}
+
 
 int *buscaMelhoresFitness( Solucao *sol, int tamPopulacao ) {
     int *melhorFitness = (int*)malloc(sizeof(int)*2);//sol[0].distancia;
+    int primeiroJaFoi = 0;
+    melhorFitness[0] = 4;
+    int dist1 = 9999999;
+    int dist2 = 9999999;
     for( int i = 0; i < tamPopulacao; i++ ) {
-        if( melhorFitness[0] > sol[i].distancia ) {
-            melhorFitness[0] = sol[i].distancia;
-        } else if( melhorFitness[1] > sol[i].distancia ) {
-            melhorFitness[1] = sol[i].distancia;
+        if( dist1 > sol[i].distancia && primeiroJaFoi == 0) {
+            dist1 = sol[i].distancia;
+            melhorFitness[0] = i;
+            primeiroJaFoi = 1;
+        } else if( dist2 > sol[i].distancia ) {
+            dist2 = sol[i].distancia;
+            melhorFitness[1] = i;
         }
     }
+    
     return melhorFitness;
 }
 

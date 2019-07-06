@@ -72,7 +72,7 @@ int main( int argc, char *argv[ ] ) {
         }
         printf("\n");
     }
-    
+    free(sol);
     fclose(f);
     return 0;
 }
