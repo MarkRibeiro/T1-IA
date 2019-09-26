@@ -54,12 +54,6 @@ int main ()
 		printf("\n");
 
 	}
-
-	printf("\n");
-	printf("\n");
-	printf("\n");
-	printf("%d", mat[1][0] + mat[2][0]); 
-
 	fclose(f);
 	return 0;
 }
