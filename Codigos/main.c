@@ -3,14 +3,21 @@
 #include <string.h>
 
 /************************************
-*
+*       Estrutura infoArquivo
+*   -> Implementada para armazenar em memória as informações provenientes do arquivo.
 * 
+*   Campos:
+*       1. name          =>   NAME: gr24
+*       2. type          =>   TYPE: TSP
+*       3. comment       =>   COMMENT: 24-city problem (Groetschel)
+*       4. dimension     =>   DIMENSION: 24
+*       5. edgeType      =>   EDGE_WEIGHT_TYPE: EXPLICIT
+*       6. edgeFormat    =>   EDGE_WEIGHT_FORMAT: LOWER_DIAG_ROW 
+*       7. edgeSection   =>   EDGE_WEIGHT_SECTION
 * 
+*   Estrutura escolhida para o armazenamento das distancias foi uma matriz.
 * 
-* 
-* 
-* 
-* ***********************************/
+*************************************/
 
 struct infoArquivo {
 	char *name;
@@ -29,12 +36,18 @@ void alocaMatrizDistancias( int ***edgeSection, int dimension );
 void zeraMatrizDistancias( int ***edgeSection );
 
     
-int main ()
-{
+int main( int argc, char *argv[ ] ) {
 	FILE *f;
-    if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
-        printf("Erro na abertura do arquivo\n");
-        return 0;
+    if( argc < 0 ) {
+        if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
+            printf("Erro na abertura do arquivo\n");
+            return 0;
+        }
+    } else {
+        if( (f = fopen(argv[1], "r") ) == NULL) {
+            printf("Erro na abertura do arquivo\n");
+            return 0;
+        }
     }
 	// Alocando estrutura com infos do arq inserido
 	infArq *cmds;
