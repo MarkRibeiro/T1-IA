@@ -2,6 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/************************************
+*
+* 
+* 
+* 
+* 
+* 
+* 
+* ***********************************/
 
 struct infoArquivo {
 	char *name;
@@ -14,9 +23,12 @@ struct infoArquivo {
 }; typedef struct infoArquivo infArq;
 
 
-void printaMatriz(int **mat);
+void printaInfoArquivo( infArq **cmds);
+void atribuindoInfosArquivo( infArq **cmds, FILE *f);
+void alocaMatrizDistancias( int ***edgeSection, int dimension );
+void zeraMatrizDistancias( int ***edgeSection );
 
-
+    
 int main ()
 {
 	FILE *f;
@@ -24,8 +36,6 @@ int main ()
         printf("Erro na abertura do arquivo\n");
         return 0;
     }
-	char linha[50];
-
 	// Alocando estrutura com infos do arq inserido
 	infArq *cmds;
 	cmds =  (infArq*) malloc(sizeof(infArq));
@@ -35,64 +45,69 @@ int main ()
 	cmds->edgeType = (char*) malloc(sizeof(char)*30);
 	cmds->edgeFormat = (char*) malloc(sizeof(char)*20);
 	//Atribuindo infos do arquivo
-	for(int aux = 0; aux < 7; aux++) {
+    atribuindoInfosArquivo(&cmds, f);
+	
+    // Imprimir Dados de estrutura
+    printaInfoArquivo(&cmds);
+
+	fclose(f);
+	return 0;
+}
+
+void atribuindoInfosArquivo( infArq **cmds, FILE *f ) {
+    char linha[50];
+    
+    for(int aux = 0; aux < 7; aux++) {
 		fgets(linha, 50, f);
         int it = 0;
 		int aux2 = 0;
         // Pega a posição que é o final do nome da tag da linha
         for(; linha[aux2] != ':'; aux2++) {}
 		aux2 = aux2 + 2;
-        // Atribui o valor da tag ao campo da estrutura
-		if( aux == 0 ) {
+        // Atribui o valor da tag para cada campo da estrutura
+		if( aux == 0 ) { // Campo NAME
 			for(; linha[aux2] != '\0'; aux2++) {
-                cmds->name[it] = linha[aux2];
+                (*cmds)->name[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 1 ) {
+		} else if( aux == 1 ) { // Campo TYPE
 			for(; linha[aux2] != '\0'; aux2++) {
-                cmds->type[it] = linha[aux2];
+                (*cmds)->type[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 2 ) {
+		} else if( aux == 2 ) {// Campo COMMENT
             for(; linha[aux2] != '\0'; aux2++) {
-                cmds->comment[it] = linha[aux2];
+                (*cmds)->comment[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 3 ) {
+		} else if( aux == 3 ) { // Campo DIMENSION
             for(; linha[aux2] != '\0'; aux2++) {
-                cmds->edgeType[it] = linha[aux2];
+                (*cmds)->edgeType[it] = linha[aux2];
                 it++;
             }
-            cmds->dimension = atoi(cmds->edgeType);
-		} else if( aux == 4 ) {
+            (*cmds)->dimension = atoi((*cmds)->edgeType);
+		} else if( aux == 4 ) { // Campo EDGETYPE
             for(; linha[aux2] != '\0'; aux2++) {
-                cmds->edgeType[it] = linha[aux2];
+                (*cmds)->edgeType[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 5 ) {
+		} else if( aux == 5 ) { // Campo EDGEFORMAT
             for(; linha[aux2] != '\0'; aux2++) {
-                cmds->edgeFormat[it] = linha[aux2];
+                (*cmds)->edgeFormat[it] = linha[aux2];
                 it++;
             }
         }
 	}
-    cmds->edgeSection = (int**) malloc(cmds->dimension*sizeof(int*));
-    for(int aux = 0; aux < cmds->dimension; aux++) {
-        cmds->edgeSection[aux] = (int*) malloc( cmds->dimension*sizeof(int) );
-    }
+	// Alocando espaço de memória de matriz de distâncias e zerando seus campos
+	alocaMatrizDistancias(&(*cmds)->edgeSection, (*cmds)->dimension);
+    zeraMatrizDistancias(&(*cmds)->edgeSection);
     int l = 0;
     int c = 0;
-    for(int i=0;i<24;i++)
+    
+    //Atribuindo informação de distancia à matriz de distancias
+	for(int j=0;fscanf(f, "%d", &(*cmds)->edgeSection[l][c])!=0;j++)
 	{
-		for(int j=0;j<24;j++)
-		{
-			cmds->edgeSection[i][j] = 0;
-		}
-	}
-	
-	for(int j=0;fscanf(f, "%d", &cmds->edgeSection[l][c])!=0;j++)
-	{
-		if(cmds->edgeSection[l][c]==0)
+		if((*cmds)->edgeSection[l][c]==0)
 		{
 			l++;
 			c=0;
@@ -102,27 +117,41 @@ int main ()
 			c++;
 		}
 	}
-	printf("nome:%s\n", cmds->name);
-    printf("type:%s\n", cmds->type);
-    printf("dimension:%d\n", cmds->dimension);
-    printf("comment:%s\n", cmds->comment);
-    printf("edgeType:%s\n", cmds->edgeType);
-    printf("edgeFormat:%s\n", cmds->edgeFormat);
-    printaMatriz(cmds->edgeSection);
-
-	fclose(f);
-	return 0;
 }
 
+void alocaMatrizDistancias( int ***edgeSection, int dimension ) {
+    (*edgeSection) = (int**) malloc( dimension*sizeof(int*) );
+    for( int aux = 0; aux < dimension; aux++ ) {
+        (*edgeSection)[aux] = (int*) malloc( dimension*sizeof(int) );
+    }
+}
 
-void printaMatriz( int **mat ) {
-    	for(int i=0;i<24;i++)
+void zeraMatrizDistancias( int ***edgeSection ) {
+    int l = 0;
+    int c = 0;
+    for(int i=0;i<24;i++)
 	{
 		for(int j=0;j<24;j++)
 		{
-			printf("%d ", mat[i][j]);
+			(*edgeSection)[i][j] = 0;
+		}
+	}    
+}
+
+
+void printaInfoArquivo( infArq **cmds ) {
+    printf("nome:%s\n", (*cmds)->name);
+    printf("type:%s\n", (*cmds)->type);
+    printf("dimension:%d\n", (*cmds)->dimension);
+    printf("comment:%s\n", (*cmds)->comment);
+    printf("edgeType:%s\n", (*cmds)->edgeType);
+    printf("edgeFormat:%s\n", (*cmds)->edgeFormat);
+    for(int i=0;i<24;i++)
+    {
+		for(int j=0;j<24;j++)
+		{
+			printf("%d ", (*cmds)->edgeSection[i][j]);
 		}
 		printf("\n");
-
 	}
 }
