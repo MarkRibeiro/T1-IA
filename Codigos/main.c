@@ -41,7 +41,7 @@ int main ()
 		int aux2 = 0;
         // Pega a posição que é o final do nome da tag da linha
         for(; linha[aux2] != ':'; aux2++) {}
-		aux2++;
+		aux2 = aux2 + 2;
         // Atribui o valor da tag ao campo da estrutura
 		if( aux == 0 ) {
 			for(; linha[aux2] != '\0'; aux2++) {
@@ -102,12 +102,12 @@ int main ()
 			c++;
 		}
 	}
-	printf("nome: %s\n", cmds->name);
-    printf("type: %s\n", cmds->type);
-    printf("dimension: %d\n", cmds->dimension);
-    printf("comment: %s\n", cmds->comment);
-    printf("edgeType: %s\n", cmds->edgeType);
-    printf("edgeFormat: %s\n", cmds->edgeFormat);
+	printf("nome:%s\n", cmds->name);
+    printf("type:%s\n", cmds->type);
+    printf("dimension:%d\n", cmds->dimension);
+    printf("comment:%s\n", cmds->comment);
+    printf("edgeType:%s\n", cmds->edgeType);
+    printf("edgeFormat:%s\n", cmds->edgeFormat);
     printaMatriz(cmds->edgeSection);
 
 	fclose(f);
