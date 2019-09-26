@@ -3,6 +3,14 @@
 #include <string.h>
 
 /************************************
+* >>>>>>>>>>>  (Para desenvolvedores) <<<<<<<<<<<
+*   Mark, coloquei a possibilidade da gente inserir novos arquivos para agilizar
+*   o teste de outros problemas. A forma de executar é:
+*   ./main <nome do arquivo> 
+* 
+*   Se nenhum arquivo for apontado, assumirei que é o gr24.tsp no intuito de não
+*   tomar muito tempo nosso. Fogoo!
+* >>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<
 *       Estrutura infoArquivo
 *   -> Implementada para armazenar em memória as informações provenientes do arquivo.
 * 
@@ -26,6 +34,7 @@ struct infoArquivo {
 	int dimension;
 	char *edgeType;
 	char *edgeFormat;
+    char *dataType;
 	int **edgeSection;
 }; typedef struct infoArquivo infArq;
 
@@ -33,12 +42,13 @@ struct infoArquivo {
 void printaInfoArquivo( infArq **cmds);
 void atribuindoInfosArquivo( infArq **cmds, FILE *f);
 void alocaMatrizDistancias( int ***edgeSection, int dimension );
-void zeraMatrizDistancias( int ***edgeSection );
+void zeraMatrizDistancias( int ***edgeSection, int dimension ) ;
+int contains( char *string, char *substring ); 
 
     
 int main( int argc, char *argv[ ] ) {
 	FILE *f;
-    if( argc < 0 ) {
+    if( argc == 1 ) {
         if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
             printf("Erro na abertura do arquivo\n");
             return 0;
@@ -56,6 +66,7 @@ int main( int argc, char *argv[ ] ) {
 	cmds->type = (char*) malloc(sizeof(char)*20);
 	cmds->comment = (char*) malloc(sizeof(char)*50);
 	cmds->edgeType = (char*) malloc(sizeof(char)*30);
+    cmds->dataType = (char*) malloc(sizeof(char)*30);
 	cmds->edgeFormat = (char*) malloc(sizeof(char)*20);
 	//Atribuindo infos do arquivo
     atribuindoInfosArquivo(&cmds, f);
@@ -70,7 +81,7 @@ int main( int argc, char *argv[ ] ) {
 void atribuindoInfosArquivo( infArq **cmds, FILE *f ) {
     char linha[50];
     
-    for(int aux = 0; aux < 7; aux++) {
+    for(int aux = 0; !contains(linha, "EDGE_WEIGHT_SECTION"); aux++) {
 		fgets(linha, 50, f);
         int it = 0;
 		int aux2 = 0;
@@ -78,42 +89,47 @@ void atribuindoInfosArquivo( infArq **cmds, FILE *f ) {
         for(; linha[aux2] != ':'; aux2++) {}
 		aux2 = aux2 + 2;
         // Atribui o valor da tag para cada campo da estrutura
-		if( aux == 0 ) { // Campo NAME
+		if( contains(linha, "NAME") ) { // Campo NAME
 			for(; linha[aux2] != '\0'; aux2++) {
                 (*cmds)->name[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 1 ) { // Campo TYPE
+		} else if( contains(linha, "TYPE") ) { // Campo TYPE
 			for(; linha[aux2] != '\0'; aux2++) {
                 (*cmds)->type[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 2 ) {// Campo COMMENT
+		} else if( contains(linha, "COMMENT") ) {// Campo COMMENT
             for(; linha[aux2] != '\0'; aux2++) {
                 (*cmds)->comment[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 3 ) { // Campo DIMENSION
+		} else if( contains(linha, "DIMENSION") ) { // Campo DIMENSION
             for(; linha[aux2] != '\0'; aux2++) {
                 (*cmds)->edgeType[it] = linha[aux2];
                 it++;
             }
             (*cmds)->dimension = atoi((*cmds)->edgeType);
-		} else if( aux == 4 ) { // Campo EDGETYPE
+		} else if( contains(linha, "EDGE_WEIGHT_TYPE") ) { // Campo EDGE_WEIGHT_TYPE
             for(; linha[aux2] != '\0'; aux2++) {
                 (*cmds)->edgeType[it] = linha[aux2];
                 it++;
             }
-		} else if( aux == 5 ) { // Campo EDGEFORMAT
+		} else if( contains(linha, "EDGE_WEIGHT_FORMAT") ) { // Campo EDGEFORMAT
             for(; linha[aux2] != '\0'; aux2++) {
                 (*cmds)->edgeFormat[it] = linha[aux2];
+                it++;
+            }
+        } else if( contains(linha, "DISPLAY_DATA_TYPE") ) {
+            for(; linha[aux2] != '\0'; aux2++) {
+                (*cmds)->dataType[it] = linha[aux2];
                 it++;
             }
         }
 	}
 	// Alocando espaço de memória de matriz de distâncias e zerando seus campos
 	alocaMatrizDistancias(&(*cmds)->edgeSection, (*cmds)->dimension);
-    zeraMatrizDistancias(&(*cmds)->edgeSection);
+    zeraMatrizDistancias(&(*cmds)->edgeSection, (*cmds)->dimension);
     int l = 0;
     int c = 0;
     
@@ -139,12 +155,10 @@ void alocaMatrizDistancias( int ***edgeSection, int dimension ) {
     }
 }
 
-void zeraMatrizDistancias( int ***edgeSection ) {
-    int l = 0;
-    int c = 0;
-    for(int i=0;i<24;i++)
+void zeraMatrizDistancias( int ***edgeSection, int dimension ) {
+    for( int i=0; i < dimension; i++ )
 	{
-		for(int j=0;j<24;j++)
+		for( int j=0; j < dimension; j++ )
 		{
 			(*edgeSection)[i][j] = 0;
 		}
@@ -159,12 +173,21 @@ void printaInfoArquivo( infArq **cmds ) {
     printf("comment:%s\n", (*cmds)->comment);
     printf("edgeType:%s\n", (*cmds)->edgeType);
     printf("edgeFormat:%s\n", (*cmds)->edgeFormat);
-    for(int i=0;i<24;i++)
+    printf("dataType:%s\n", (*cmds)->dataType);
+    for( int i=0; i < (*cmds)->dimension; i++ )
     {
-		for(int j=0;j<24;j++)
+		for( int j=0; j < (*cmds)->dimension;j++ )
 		{
 			printf("%d ", (*cmds)->edgeSection[i][j]);
 		}
 		printf("\n");
 	}
+}
+
+int contains( char *string, char *substring ) {
+    if(strstr(string, substring) != NULL) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
