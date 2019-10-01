@@ -63,14 +63,20 @@ int main( int argc, char *argv[ ] ) {
 	infArq *cmds;
 	cmds =  (infArq*) malloc(sizeof(infArq));
 	cmds->name = (char*) malloc(sizeof(char)*20);
+    strcpy(cmds->name, " ");
 	cmds->type = (char*) malloc(sizeof(char)*20);
+    strcpy(cmds->type, " ");
 	cmds->comment = (char*) malloc(sizeof(char)*50);
+    strcpy(cmds->comment, " ");
 	cmds->edgeType = (char*) malloc(sizeof(char)*30);
+    strcpy(cmds->edgeType, " ");
     cmds->dataType = (char*) malloc(sizeof(char)*30);
+    strcpy(cmds->dataType, " ");
 	cmds->edgeFormat = (char*) malloc(sizeof(char)*20);
+    strcpy(cmds->edgeFormat, " ");
+
 	//Atribuindo infos do arquivo
     atribuindoInfosArquivo(&cmds, f);
-	
     // Imprimir Dados de estrutura
     printaInfoArquivo(&cmds);
 
@@ -167,13 +173,25 @@ void zeraMatrizDistancias( int ***edgeSection, int dimension ) {
 
 
 void printaInfoArquivo( infArq **cmds ) {
-    printf("nome:%s\n", (*cmds)->name);
-    printf("type:%s\n", (*cmds)->type);
+    if( strcmp((*cmds)->name," ") ) {
+        printf("nome:%s\n", (*cmds)->name);
+    }
+    if( strcmp((*cmds)->type," ") ) {
+        printf("type:%s\n", (*cmds)->type);
+    }
     printf("dimension:%d\n", (*cmds)->dimension);
-    printf("comment:%s\n", (*cmds)->comment);
-    printf("edgeType:%s\n", (*cmds)->edgeType);
-    printf("edgeFormat:%s\n", (*cmds)->edgeFormat);
-    printf("dataType:%s\n", (*cmds)->dataType);
+    if( strcmp((*cmds)->comment," ") ) {
+        printf("comment:%s\n", (*cmds)->comment);
+    }
+    if( strcmp((*cmds)->edgeType," ") ) {
+        printf("edgeType:%s\n", (*cmds)->edgeType);
+    }
+    if( strcmp((*cmds)->edgeFormat," ") ) {
+        printf("edgeFormat:%s\n", (*cmds)->edgeFormat);
+    }
+    if( strcmp((*cmds)->dataType," ") ) {
+        printf("dataType:%s\n", (*cmds)->dataType);
+    }
     for( int i=0; i < (*cmds)->dimension; i++ )
     {
 		for( int j=0; j < (*cmds)->dimension;j++ )
