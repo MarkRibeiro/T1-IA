@@ -44,6 +44,7 @@ void atribuindoInfosArquivo( infArq **cmds, FILE *f);
 void alocaMatrizDistancias( int ***edgeSection, int dimension );
 void zeraMatrizDistancias( int ***edgeSection, int dimension ) ;
 int contains( char *string, char *substring ); 
+void gulosa( infArq **cmds );
 
     
 int main( int argc, char *argv[ ] ) {
@@ -79,6 +80,7 @@ int main( int argc, char *argv[ ] ) {
     atribuindoInfosArquivo(&cmds, f);
     // Imprimir Dados de estrutura
     printaInfoArquivo(&cmds);
+    gulosa(&cmds);
 
 	fclose(f);
 	return 0;
@@ -208,4 +210,23 @@ int contains( char *string, char *substring ) {
     } else {
         return 0;
     }
+}
+
+void gulosa( infArq **cmds ){
+    int total = 0, menor;
+
+    menor = (*cmds)->edgeSection[1][0];
+    for(int i=1;i<24;i++){
+        for(int j=0;(*cmds)->edgeSection[i][j]!=0;j++){
+            if((*cmds)->edgeSection[i][j]<menor){
+                menor = (*cmds)->edgeSection[i][j];
+            }
+        }
+        printf("%d\n", menor);
+        total = total + menor;
+        menor = 999;
+    }
+    printf("****\n");
+    printf("%d %d\n", total, menor);
+    printf("****\n");
 }
