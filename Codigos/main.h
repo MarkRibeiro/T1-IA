@@ -39,53 +39,18 @@ struct infoArquivo {
 }; typedef struct infoArquivo infArq;
 
 
-void printaInfoArquivo( infArq **cmds);
-void atribuindoInfosArquivo( infArq **cmds, FILE *f);
+void atribuindoInfosArquivo( infArq **cmds, FILE *f );
+void lowerDiagRow( int ***edgeSection, int dimension , FILE *f );
+void upperDiagRow( int ***edgeSection, int dimension , FILE *f );
+void upperRow( int ***edgeSection, int dimension , FILE *f );
 void alocaMatrizDistancias( int ***edgeSection, int dimension );
 void zeraMatrizDistancias( int ***edgeSection, int dimension ) ;
+void printaInfoArquivo( infArq **cmds );
 int contains( char *string, char *substring ); 
+void completaMatriz( int ***edgeSection, char *edgeFormat, int dimension );
 void gulosa( infArq **cmds );
 
-    
-int main( int argc, char *argv[ ] ) {
-    FILE *f;
-    if( argc == 1 ) {
-        if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
-            printf("Erro na abertura do arquivo\n");
-            return 0;
-        }
-    } else {
-        if( (f = fopen(argv[1], "r") ) == NULL) {
-            printf("Erro na abertura do arquivo\n");
-            return 0;
-        }
-    }
-    // Alocando estrutura com infos do arq inserido
-    infArq *cmds;
-    cmds =  (infArq*) malloc(sizeof(infArq));
-    cmds->name = (char*) malloc(sizeof(char)*20);
-    strcpy(cmds->name, " ");
-    cmds->type = (char*) malloc(sizeof(char)*20);
-    strcpy(cmds->type, " ");
-    cmds->comment = (char*) malloc(sizeof(char)*50);
-    strcpy(cmds->comment, " ");
-    cmds->edgeType = (char*) malloc(sizeof(char)*30);
-    strcpy(cmds->edgeType, " ");
-    cmds->dataType = (char*) malloc(sizeof(char)*30);
-    strcpy(cmds->dataType, " ");
-    cmds->edgeFormat = (char*) malloc(sizeof(char)*20);
-    strcpy(cmds->edgeFormat, " ");
-
-    //Atribuindo infos do arquivo
-    atribuindoInfosArquivo(&cmds, f);
-    // Imprimir Dados de estrutura
-    printaInfoArquivo(&cmds);
-    //gulosa(&cmds);
-
-    fclose(f);
-    return 0;
-}
-
+ 
 void atribuindoInfosArquivo( infArq **cmds, FILE *f ) {
     char linha[50];
     
@@ -98,63 +63,109 @@ void atribuindoInfosArquivo( infArq **cmds, FILE *f ) {
         aux2 = aux2 + 2;
         // Atribui o valor da tag para cada campo da estrutura
         if( contains(linha, "NAME") ) { // Campo NAME
-            for(; linha[aux2] != '\0'; aux2++) {
+            for(; linha[aux2] != '\n'; aux2++) {
                 (*cmds)->name[it] = linha[aux2];
                 it++;
             }
-        } else if( contains(linha, "TYPE") ) { // Campo TYPE
-            for(; linha[aux2] != '\0'; aux2++) {
-                (*cmds)->type[it] = linha[aux2];
-                it++;
-            }
         } else if( contains(linha, "COMMENT") ) {// Campo COMMENT
-            for(; linha[aux2] != '\0'; aux2++) {
+            for(; linha[aux2] != '\n'; aux2++) {
                 (*cmds)->comment[it] = linha[aux2];
                 it++;
             }
         } else if( contains(linha, "DIMENSION") ) { // Campo DIMENSION
-            for(; linha[aux2] != '\0'; aux2++) {
+            for(; linha[aux2] != '\n'; aux2++) {
                 (*cmds)->edgeType[it] = linha[aux2];
                 it++;
             }
             (*cmds)->dimension = atoi((*cmds)->edgeType);
         } else if( contains(linha, "EDGE_WEIGHT_TYPE") ) { // Campo EDGE_WEIGHT_TYPE
-            for(; linha[aux2] != '\0'; aux2++) {
+            for(; linha[aux2] != '\n'; aux2++) {
                 (*cmds)->edgeType[it] = linha[aux2];
                 it++;
             }
         } else if( contains(linha, "EDGE_WEIGHT_FORMAT") ) { // Campo EDGEFORMAT
-            for(; linha[aux2] != '\0'; aux2++) {
+            for(; linha[aux2] != '\n'; aux2++) {
                 (*cmds)->edgeFormat[it] = linha[aux2];
                 it++;
             }
         } else if( contains(linha, "DISPLAY_DATA_TYPE") ) {
-            for(; linha[aux2] != '\0'; aux2++) {
+            for(; linha[aux2] != '\n'; aux2++) {
                 (*cmds)->dataType[it] = linha[aux2];
                 it++;
             }
-        }
+        } else if( contains(linha, "TYPE") ) { // Campo TYPE
+            for(; linha[aux2] != '\n'; aux2++) {
+                (*cmds)->type[it] = linha[aux2];
+                it++;
+            }
+        } 
     }
     // Alocando espaço de memória de matriz de distâncias e zerando seus campos
     alocaMatrizDistancias(&(*cmds)->edgeSection, (*cmds)->dimension);
-    zeraMatrizDistancias(&(*cmds)->edgeSection, (*cmds)->dimension);
+    zeraMatrizDistancias(&(*cmds)->edgeSection, (*cmds)->dimension);  
+    //Atribuindo informação de distancia à matriz de distancias
+    if( contains((*cmds)->edgeFormat, "LOWER_DIAG_ROW") ) {
+        lowerDiagRow(&(*cmds)->edgeSection, (*cmds)->dimension, f);
+    } else if( contains((*cmds)->edgeFormat, "UPPER_ROW") ) {
+        upperRow(&(*cmds)->edgeSection, (*cmds)->dimension, f);
+    } else if( contains((*cmds)->edgeFormat, "UPPER_DIAG_ROW") ) {
+        upperDiagRow(&(*cmds)->edgeSection, (*cmds)->dimension, f);
+    }
+
+    completaMatriz(&(*cmds)->edgeSection, (*cmds)->edgeFormat, (*cmds)->dimension);
+}
+
+void lowerDiagRow( int ***edgeSection, int dimension , FILE *f ) {
     int l = 0;
-    int c = 1;
+    int c = 0;
+    for(int j=0;fscanf(f, "%d", &(*edgeSection)[l][c])!=0;j++) {
+        if((*edgeSection)[l][c]==0) {
+            l++;
+            c=0;
+        }
+        else {
+            c++;
+        }
+    }
+}
+
+void upperDiagRow( int ***edgeSection, int dimension , FILE *f ) {
+    int l = 0;
+    int c = 0;
     int aux = 0;
-    
-    if(strcmp((*cmds)->edgeFormat, "UPPER_DIAG_ROW\n") == 0){
-        printf("UPPER_DIAG_ROW\n");
-        for(int j=0;fscanf(f, "%d", &(*cmds)->edgeSection[l][c])!=0;c++) {
-            if((*cmds)->edgeSection[l][c]==0 && aux==1) {
-                //printf("\n");
-                l++;
-                aux = 0;
+    for(;fscanf(f, "%d", &(*edgeSection)[l][c])!=0;c++) {
+        if((*edgeSection)[l][c]==0 && aux==1) {
+            l++;
+            aux = 0;
+        }
+        if((*edgeSection)[l][c]==0){
+            aux = 1;
+            c = l;
+        }
+    }
+}
+
+void upperRow( int ***edgeSection, int dimension , FILE *f) {
+    int l = 0;
+    int c = 0;
+    (*edgeSection)[l][c] = 0;
+    c++;
+    for(int j=0;fscanf(f, "%d", &(*edgeSection)[l][c])!=0;j++) {
+        int aux = 0;
+        if( c == 0 ) {
+            int lastInserted = (*edgeSection)[l][c];
+            while( aux < l + 1 ) {
+                (*edgeSection)[l][c] = 0;
+                c++;
+                aux++;
             }
-            if((*cmds)->edgeSection[l][c]==0){
-                aux = 1;
-                c = l;
-            }
-            //printf("%d ", (*cmds)->edgeSection[l][c]);
+            (*edgeSection)[l][c] = lastInserted;
+        }
+        if( c == dimension - 1 ) {
+            l++;
+            c=0;
+        } else {
+            c++;
         }
     }
 }
@@ -212,6 +223,18 @@ int contains( char *string, char *substring ) {
         return 1;
     } else {
         return 0;
+    }
+}
+
+void completaMatriz( int ***edgeSection, char *edgeFormat, int dimension ) {
+    for(int linha=0;linha<dimension;linha++) {
+        for(int coluna=0;coluna<dimension;coluna++) {
+            if( contains(edgeFormat, "UPPER") ) {
+                (*edgeSection)[coluna][linha] = (*edgeSection)[linha][coluna];
+            } else if( contains(edgeFormat, "LOWER" ) ) { 
+                (*edgeSection)[linha][coluna] = (*edgeSection)[coluna][linha];
+            }
+        }
     }
 }
 
