@@ -80,7 +80,7 @@ int main( int argc, char *argv[ ] ) {
     atribuindoInfosArquivo(&cmds, f);
     // Imprimir Dados de estrutura
     printaInfoArquivo(&cmds);
-    gulosa(&cmds);
+    //gulosa(&cmds);
 
 	fclose(f);
 	return 0;
@@ -141,19 +141,24 @@ void atribuindoInfosArquivo( infArq **cmds, FILE *f ) {
     int l = 0;
     int c = 0;
     
-    //Atribuindo informação de distancia à matriz de distancias
-	for(int j=0;fscanf(f, "%d", &(*cmds)->edgeSection[l][c])!=0;j++)
-	{
-		if((*cmds)->edgeSection[l][c]==0)
-		{
-			l++;
-			c=0;
-		}
-		else
-		{
-			c++;
-		}
-	}
+    if(strcmp((*cmds)->edgeFormat, "LOWER_DIAG_ROW \n") == 0) {
+        //Atribuindo informação de distancia à matriz de distancias
+    	for(int j=0;fscanf(f, "%d", &(*cmds)->edgeSection[l][c])!=0;j++) {
+    		if((*cmds)->edgeSection[l][c]==0) {
+    			l++;
+    			c=0;
+    		} else {
+    			c++;
+    		}
+    	}
+    }
+    if(strcmp((*cmds)->edgeFormat, "UPPER_DIAG_ROW\n") == 0){
+        printf("UPPER_DIAG_ROW\n"); 
+    }
+
+    if(strcmp((*cmds)->edgeFormat, "UPPER_ROW \n") == 0){
+        printf("UPPER_ROW \n");
+    }
 }
 
 void alocaMatrizDistancias( int ***edgeSection, int dimension ) {
