@@ -238,21 +238,45 @@ void completaMatriz( int ***edgeSection, char *edgeFormat, int dimension ) {
     }
 }
 
-void gulosa( infArq **cmds ){
-    int total = 0, menor;
-
-    menor = (*cmds)->edgeSection[1][0];
-    for(int i=1;i<24;i++){
-        for(int j=0;(*cmds)->edgeSection[i][j]!=0;j++){
-            if((*cmds)->edgeSection[i][j]<menor){
-                menor = (*cmds)->edgeSection[i][j];
+void gulosa( infArq **cmds )
+{
+    int cidadeOrigem = 0;
+    int vetAux[(*cmds)->dimension];
+    int total = 0;
+    int cidadeDestino =1;
+    int count = 0;
+    int menor = (*cmds)->edgeSection[cidadeOrigem][cidadeDestino];
+    
+    for(int i=0; i<(*cmds)->dimension;i++)
+    {
+        vetAux[i]=(*cmds)->edgeSection[i][cidadeOrigem];
+        (*cmds)->edgeSection[i][cidadeOrigem] = 0;
+    }
+    
+    while(count<(*cmds)->dimension-1)
+    {
+        for(int aux=0;aux<(*cmds)->dimension;aux++)
+        {
+            if((*cmds)->edgeSection[cidadeOrigem][aux]<menor && (*cmds)->edgeSection[cidadeOrigem][aux]!=0)
+            {
+                cidadeDestino = aux;
+                menor = (*cmds)->edgeSection[cidadeOrigem][aux];
             }
         }
-        printf("%d\n", menor);
+        //ao final
         total = total + menor;
-        menor = 999;
-    }
+         printf("cidade origem: %d cidade destino: %d gasto: %d\n", cidadeOrigem, cidadeDestino, menor);
+        cidadeOrigem = cidadeDestino;
+        cidadeDestino = 0;
+        menor = 9999;//Tem que arrumar isso aqui 
+        for(int i=0; i<(*cmds)->dimension;i++)
+        {
+            (*cmds)->edgeSection[i][cidadeOrigem] = 0;
+        }
+        count++;
+        }
+    total = total + vetAux[cidadeOrigem];
     printf("****\n");
-    printf("%d %d\n", total, menor);
+    printf("%d\n", total);
     printf("****\n");
 }

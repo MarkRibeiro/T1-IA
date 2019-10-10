@@ -33,7 +33,7 @@ int main( int argc, char *argv[ ] ) {
     atribuindoInfosArquivo(&cmds, f);
     // Imprimir Dados de estrutura
     printaInfoArquivo(&cmds);
-    //gulosa(&cmds);
+    gulosa(&cmds);
 
     fclose(f);
     return 0;
