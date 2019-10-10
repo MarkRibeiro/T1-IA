@@ -41,7 +41,7 @@ struct infoArquivo {
 struct solucao {
     int *cidades;
     int distancia;
-} typedef struct solucao Solucao;
+}; typedef struct solucao Solucao;
 
 void atribuindoInfosArquivo( infArq **cmds, FILE *f );
 void lowerDiagRow( int ***edgeSection, int dimension , FILE *f );
