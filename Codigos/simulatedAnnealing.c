@@ -33,21 +33,24 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
     //int distancia = matriz[cidadeAtual][cidadeDestino];
     int dado;
     int novoDestino;
-    int aux=1;
+    int novoEstadoInicial;
+    int aux = 0;
     int mult = 100/tam;
     int cont = 0;
 
-    sol->cidades[0] = 0;
+    //sol->cidades[0] = 0;
     
     printf("inicio: matriz[0][1] = %d\n", matriz[0][1]);
 
-    while(cont<99999999){
-        cidadeAtual = 0;
-        cidadeDestino = 1;
+    while(cont<99999999) {
         iniciaVetorCidadesPercorridas (sol->cidades, tam);
-        sol->cidades[0] = 0;
-        aux = 1;
-        while(aux<tam){
+        aux = 0;
+        while(aux<tam) {
+            if( aux == 0 ) {
+                novoEstadoInicial = rand() % tam;
+                sol->cidades[aux] = novoEstadoInicial;
+                continue;
+            }
             srand(time(0));
             dado = rand() % 100;
             if(dado<=mult*(tam-aux)){
