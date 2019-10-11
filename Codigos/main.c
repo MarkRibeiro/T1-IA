@@ -1,18 +1,33 @@
-#include"main.h"
-   
+#include "main.h"
+#include "algGenetico.h"
+
+
 int main( int argc, char *argv[ ] ) {
     FILE *f;
-    if( argc == 1 ) {
+    int algoritmo;
+    if( argc == 2 ) {
         if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
             printf("Erro na abertura do arquivo\n");
             return 0;
         }
+        if( contains(argv[1], "genetico" ) ) {
+            algoritmo = ALGORITMO_GENETICO;
+        } else if( contains(argv[1], "annealing" ) ) {
+            algoritmo = SIMULATED_ANNEALING;
+        } else {
+            printf("Insira um algoritmo válido! genetico ou annealing\n");
+            return 0;
+        }
+    } else if( argc != 2 ) {
+        printf("Execute o programa assim:\n> ./main <nome_arquivo_tsp> <algoritmo>\n ==> algoritmo pode ser genetico ou annealing.\n ==> arquivo deverá ser um tsp proposto\nEX: ./main ../Instancias/gr24.tsp genetico\n");
+        return 0;
     } else {
         if( (f = fopen(argv[1], "r") ) == NULL) {
             printf("Erro na abertura do arquivo\n");
             return 0;
         }
     }
+    //printf("algoritmo inserido: %d\n", algoritmo);
     // Alocando estrutura com infos do arq inserido
     infArq *cmds;
     cmds =  (infArq*) malloc(sizeof(infArq));
@@ -32,9 +47,20 @@ int main( int argc, char *argv[ ] ) {
     //Atribuindo infos do arquivo
     atribuindoInfosArquivo(&cmds, f);
     // Imprimir Dados de estrutura
-    printaInfoArquivo(&cmds);
-    gulosa(&cmds);
-
+//  printaInfoArquivo(&cmds);
+//  gulosa(&cmds);
+    Solucao *sol;
+    if( algoritmo == ALGORITMO_GENETICO ) {
+        sol = algoritmoGenetico(cmds->edgeSection, cmds->dimension );
+    }
+    
+    for( int t = 0; t < cmds->dimension/5; t++ ) {
+        printf("Solucao:\n=>distancia: %d\n=>cidades:", sol[t].distancia);
+        for( int i = 0; i < cmds->dimension; i++ ) {
+            printf(" %d ", sol[t].cidades[i]);
+        }
+    }
+    printf("\n");
     fclose(f);
     return 0;
 }

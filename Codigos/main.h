@@ -6,7 +6,8 @@
 * >>>>>>>>>>>  (Para desenvolvedores) <<<<<<<<<<<
 *   Mark, coloquei a possibilidade da gente inserir novos arquivos para agilizar
 *   o teste de outros problemas. A forma de executar é:
-*   ./main <nome do arquivo> 
+*   ./main <nome do arquivo> -genetico (para rodar ALGORITMO_GENETICO)
+*   ./main <nome do arquivo> -annealing (para rodar SIMULATED_ANNEALING)
 * 
 *   Se nenhum arquivo for apontado, assumirei que é o gr24.tsp no intuito de não
 *   tomar muito tempo nosso. Fogoo!
@@ -38,11 +39,16 @@ struct infoArquivo {
     int **edgeSection;
 }; typedef struct infoArquivo infArq;
 
-struct solucao {
-    int *cidades;
-    int distancia;
-}; typedef struct solucao Solucao;
 
+enum Algoritmo {
+    ALGORITMO_GENETICO,
+    SIMULATED_ANNEALING
+};
+
+// Funcoes de algoritmo, possivelomente vamos tirar daqui
+void gulosa( infArq **cmds );
+
+// Funcoes para infoArquivo
 void atribuindoInfosArquivo( infArq **cmds, FILE *f );
 void lowerDiagRow( int ***edgeSection, int dimension , FILE *f );
 void upperDiagRow( int ***edgeSection, int dimension , FILE *f );
@@ -50,7 +56,6 @@ void upperRow( int ***edgeSection, int dimension , FILE *f );
 void alocaMatrizDistancias( int ***edgeSection, int dimension );
 void zeraMatrizDistancias( int ***edgeSection, int dimension ) ;
 void printaInfoArquivo( infArq **cmds );
-int contains( char *string, char *substring ); 
 void completaMatriz( int ***edgeSection, char *edgeFormat, int dimension );
-void gulosa( infArq **cmds );
-
+// Funcoes uteos
+int contains( char *string, char *substring ); 
