@@ -28,17 +28,13 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
     Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
     sol->cidades = (int*)malloc(sizeof(int)*tam);
     melhor->cidades = (int*)malloc(sizeof(int)*tam);
-    int cidadeAtual;
-    int cidadeDestino;
-    //int distancia = matriz[cidadeAtual][cidadeDestino];
+
     int dado;
     int novoDestino;
     int novoEstadoInicial;
     int aux = 0;
     int mult = 100/tam;
     int cont = 0;
-
-    //sol->cidades[0] = 0;
     
     printf("inicio: matriz[0][1] = %d\n", matriz[0][1]);
 
@@ -49,6 +45,7 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
             if( aux == 0 ) {
                 novoEstadoInicial = rand() % tam;
                 sol->cidades[aux] = novoEstadoInicial;
+                aux++;
                 continue;
             }
             srand(time(0));
@@ -59,12 +56,10 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
                     novoDestino = rand() % tam;
                 }
             }else{
-                novoDestino = getMenorCaminho(matriz, cidadeAtual, sol->cidades, tam);
+                novoDestino = getMenorCaminho(matriz, sol->cidades[aux-1], sol->cidades, tam);
             }
             sol->cidades[aux] = novoDestino;
             aux++;
-            //printf("[%d][%d][%d][%d]\n", sol->cidades[0], sol->cidades[1], sol->cidades[2], sol->cidades[3]);
-            cidadeAtual = novoDestino;
         }
         sol->distancia = somaCaminhos( matriz, sol->cidades, tam );
         if( melhor->distancia > sol->distancia || cont==0 ){
