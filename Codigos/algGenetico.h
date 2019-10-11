@@ -1,4 +1,4 @@
-#include "Solucao.h"
+#include "simulatedAnnealing.h"
 
 Solucao *populacaoInicial( int dimension, int **edgeSection );
 Solucao *algoritmoGenetico( int **edgeSection, int dimension );
