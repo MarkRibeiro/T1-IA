@@ -1,10 +1,10 @@
 #include "main.h"
 #include "algGenetico.h"
 
-
 int main( int argc, char *argv[ ] ) {
     FILE *f;
     int algoritmo;
+    signal(SIGALRM, alarm_handler);
     if( argc == 2 ) {
         if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
             printf("Erro na abertura do arquivo\n");
@@ -18,13 +18,18 @@ int main( int argc, char *argv[ ] ) {
             printf("Insira um algoritmo válido! genetico ou annealing\n");
             return 0;
         }
-    } else if( argc != 2 ) {
+    } else if( argc != 3 ) {
         printf("Execute o programa assim:\n> ./main <nome_arquivo_tsp> <algoritmo>\n ==> algoritmo pode ser genetico ou annealing.\n ==> arquivo deverá ser um tsp proposto\nEX: ./main ../Instancias/gr24.tsp genetico\n");
         return 0;
     } else {
         if( (f = fopen(argv[1], "r") ) == NULL) {
             printf("Erro na abertura do arquivo\n");
             return 0;
+        }
+        if( contains(argv[2], "genetico" ) ) {
+            algoritmo = ALGORITMO_GENETICO;
+        } else if( contains(argv[2], "annealing" ) ) {
+            algoritmo = SIMULATED_ANNEALING;
         }
     }
     //printf("algoritmo inserido: %d\n", algoritmo);

@@ -1,4 +1,10 @@
 #include"simulatedAnnealing.h"
+int timer = 0;
+
+void alarm_handler(int signum) {
+    timer++;
+    alarm(1);
+}
 
 int jaPassou(int cidade, int *vetor, int tam){
     for(int i=0;i<tam;i++){
@@ -38,6 +44,7 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
     
     printf("inicio: matriz[0][1] = %d\n", matriz[0][1]);
 
+    alarm(1);
     while(cont<99999999) {
         iniciaVetorCidadesPercorridas (sol->cidades, tam);
         aux = 0;
@@ -67,7 +74,7 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
             copiaVetor(melhor->cidades, sol->cidades, tam);
             melhor->distancia = somaCaminhos( matriz, melhor->cidades, tam );
             printf("Melhor: %d\n", melhor->distancia);
-            printf("em %ds\n", cont/26473);
+            printf("em %ds\n", timer);
         }
         cont++;
     }
