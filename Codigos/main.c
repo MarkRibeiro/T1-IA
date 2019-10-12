@@ -57,13 +57,12 @@ int main( int argc, char *argv[ ] ) {
     Solucao *sol;
     if( algoritmo == ALGORITMO_GENETICO ) {
         sol = algoritmoGenetico(cmds->edgeSection, cmds->dimension );
-        for( int t = 0; t < cmds->dimension/5; t++ ) {
-            printf("Solucao:\n=>distancia: %d\n=>cidades:", sol[t].distancia);
-            for( int i = 0; i < cmds->dimension; i++ ) {
-                printf(" %d ", sol[t].cidades[i]);
-            }
-            printf("\n");
+        //for( int t = 0; t < cmds->dimension/5; t++ ) {
+        printf("Solucao:\n=>distancia: %d\n=>cidades:", sol->distancia);
+        for( int i = 0; i < cmds->dimension; i++ ) {
+            printf(" %d ", sol->cidades[i]);
         }
+        printf("\n");
     } else if( algoritmo == SIMULATED_ANNEALING ){
         sol = simulatedAnnealing( cmds->edgeSection, cmds->dimension );
         printf("Solucao:\n=>distancia: %d\n=>cidades:", sol[0].distancia);

@@ -7,18 +7,17 @@
 
 Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
     //int *v = (int*)malloc(sizeof(int)*dimension);
-    int distancia;
 //     for(int i = 0; i < dimension; i++) {
 //         v[i] = i;
 //         distancia = distancia + i;
 //     }
-    int tamPopulacao = dimension / 5;
-    Solucao *sol = populacaoInicial( dimension, edgeSection );
-
-    int numMutacoes = 0;
+    int tamPopulacao = 100;
+    Solucao *sol = populacaoInicial( dimension, edgeSection, tamPopulacao );
+    Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
+    melhor->cidades = (int*)malloc(sizeof(int)*dimension);
     int cont = 0;
-    int melhor = 9999999;
-    while( cont < 99999999 ) {
+    melhor->distancia = 9999999;
+    while( cont < 99999 ) {
         int *paisIndx = buscaMelhoresFitness( sol, tamPopulacao );
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
@@ -27,17 +26,21 @@ Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
         mutacao( sol[indxP2].cidades, dimension );
         sol[indxP1].distancia = calculaDistancia(sol[indxP1].cidades, edgeSection, dimension);
         sol[indxP2].distancia = calculaDistancia(sol[indxP2].cidades, edgeSection, dimension);
-        if( melhor > sol[indxP1].distancia ) {
-            melhor = sol[indxP1].distancia;
-            printf("\nDistancia: %d\n", melhor);
+        if( melhor->distancia > sol[indxP1].distancia ) {
+            melhor->distancia = sol[indxP1].distancia;
+            printf("\nDistancia: %d\n", melhor->distancia);
+            copiaVetor(melhor->cidades, sol[indxP1].cidades, dimension);
+            melhor->distancia = calculaDistancia( melhor->cidades, edgeSection, dimension);
         }
-        if( melhor > sol[indxP2].distancia ) {
-            melhor = sol[indxP2].distancia;
-            printf("\nDistancia: %d\n", melhor);
+        if( melhor->distancia > sol[indxP2].distancia ) {
+            melhor->distancia = sol[indxP2].distancia;
+            printf("\nDistancia: %d\n", melhor->distancia);
+            copiaVetor(melhor->cidades, sol[indxP2].cidades, dimension);
+            melhor->distancia = calculaDistancia( melhor->cidades, edgeSection, dimension);
         }
         cont++;
     }
-    return sol;
+    return melhor;
 }
 
 double fitnessFunction( int distancia ) { 
@@ -72,7 +75,6 @@ void crossover( int *p1, int *p2, int dimension ) {
 //     }
 //     printf("\n\n\n");
     for( int i = 0; i < crossoverPoint; i++ ) {
-        int pos;
         for( int t = 0; t < dimension; t++ ) {
             if( p1[t] == intervaloP2[i] ) {
                 p1[t] = p1[i];
@@ -104,38 +106,76 @@ void mutacao( int *p1, int dimension ) {
 
 }
 
-
-int *buscaMelhoresFitness( Solucao *sol, int tamPopulacao ) {
-    int *melhorFitness = (int*)malloc(sizeof(int)*2);//sol[0].distancia;
-    int primeiroJaFoi = 0;
-    melhorFitness[0] = 4;
-    int dist1 = 9999999;
-    int dist2 = 9999999;
+void organizaPorFitness( Solucao *sol, int tamPopulacao ) {
+    Solucao aux;
     for( int i = 0; i < tamPopulacao; i++ ) {
-        if( dist1 > sol[i].distancia && primeiroJaFoi == 0) {
-            dist1 = sol[i].distancia;
-            melhorFitness[0] = i;
-            primeiroJaFoi = 1;
-        } else if( dist2 > sol[i].distancia ) {
-            dist2 = sol[i].distancia;
-            melhorFitness[1] = i;
+        for( int j = 0; j < tamPopulacao - 1; j++ ) {
+            if( sol[j].distancia < sol[j+1].distancia ) {
+                aux = sol[j];
+                sol[j] = sol[j+1];
+                sol[j+1] = aux;
+            }
         }
     }
-    
+//     for( int t = 0; t < tamPopulacao; t++ ) {
+//         printf("Solucao:\n=>distancia: %d\n=>cidades:", sol[t].distancia);
+//         for( int i = 0; i < 24; i++ ) {
+//             printf(" %d ", sol[t].cidades[i]);
+//         }
+//         printf("\n------------\n");
+//     }
+}
+
+// Aqui iremos escolher os pais. Utilizamos o valor do fitness como parametro para
+// tomar a melhor escolha, dado maior probabidalide de escolha para os pais que 
+// tem um melhor fitness, mas não retirando a possibilidade fitness mais baixos
+// aparecerem
+int *buscaMelhoresFitness( Solucao *sol, int tamPopulacao ) {
+    int *melhorFitness = (int*)malloc(sizeof(int)*2);
+    organizaPorFitness(sol, tamPopulacao); // organiza por fitness
+    int aux = 0;
+    for(int i = 1; i <= tamPopulacao; i++) {
+        aux += i;
+    }
+    double mult = 100.0/(double)aux;
+    int primeiroJaFoi = 0;
+    srand(time(0));
+    int dado = rand() % 100;
+    for( int j = 0; j < 2; j++ ) {
+        int auxPorc = 100 - mult*(tamPopulacao-1);
+        for( int i = (tamPopulacao-1); 0 < i; i-- ) {
+            if( dado > auxPorc && primeiroJaFoi == 0) {
+                melhorFitness[0] = i;
+                primeiroJaFoi = 1;
+                break;;
+            } else if( dado > auxPorc ) {
+                melhorFitness[1] = i;
+                break;
+            }
+            auxPorc -= mult*i;
+        }
+        srand(dado);
+        dado = rand() % 100;
+    }
     return melhorFitness;
 }
 
-Solucao *populacaoInicial( int dimension, int **edgeSection ) {
-    int tamPopulacao = dimension / 5;
-    //int *v = (int*)malloc(sizeof(int)*dimension);
+Solucao *populacaoInicial( int dimension, int **edgeSection, int tamPopulacao ) {
     Solucao *sol = (Solucao*)malloc(sizeof(Solucao)*tamPopulacao);
     for( int i = 0; i < tamPopulacao; i++ ) {
         int *cidadesDisponiveis = criaVetorCidadesDisponiveis( dimension);
         int tamVetorCidadesDisponiveis = dimension;
         sol[i].cidades = (int*)malloc(sizeof(int)*dimension);
+        srand(time(0));
+        int dado = rand() % 100;
         for( int t = 0; t < dimension; t++ ) {
-            sol[i].cidades[t] = escolheCidadeAleatoria( cidadesDisponiveis, tamVetorCidadesDisponiveis );
-            tamVetorCidadesDisponiveis--;
+            if( dado > 50 || t == 0 ) {
+                sol[i].cidades[t] = escolheCidadeAleatoria( cidadesDisponiveis, tamVetorCidadesDisponiveis );
+                tamVetorCidadesDisponiveis--;
+            } else {
+                sol[i].cidades[t] = escolheCidadeGulosa( cidadesDisponiveis, sol[i].cidades[t-1], tamVetorCidadesDisponiveis , edgeSection);
+                tamVetorCidadesDisponiveis--;
+            }
         }
         sol[i].distancia = calculaDistancia( sol[i].cidades, edgeSection, dimension );
         //sleep(1);
@@ -149,6 +189,7 @@ int calculaDistancia( int *v, int **edgeSection, int dimension ) {
         //printf("edgeSection[%d][%d] = %d\n", v[i], v[i+1], edgeSection[v[i]][v[i+1]]); 
         distancia += edgeSection[v[i]][v[i+1]];
     }
+    distancia+= edgeSection[v[0]][v[dimension-1]];
     return distancia;
 }   
 
@@ -170,6 +211,29 @@ int escolheCidadeAleatoria( int *cidadesDisponiveis, int tam ) {
     }    
     
     return cidade;
+}
+
+// Gerando cidade baseada em distancia. 
+int escolheCidadeGulosa( int *cidadesDisponiveis, int cidadeAtual, int tam, int **edgeSection ) {  
+    int aux;
+    int melhor = 99999;
+    int melhorCidade = 0;
+    for( int i = 0; i < tam; i++ ) {
+        if( melhor > edgeSection[cidadeAtual][i] && cidadeAtual != i) {
+            melhor = edgeSection[cidadeAtual][i];
+            melhorCidade = i;
+        }
+    }
+    cidadesDisponiveis[melhorCidade] = -1;
+    for( int i = 0; i < tam-1; i++ ) {
+        if( cidadesDisponiveis[i] == -1) {
+            aux = cidadesDisponiveis[i+1];
+            cidadesDisponiveis[i+1] = cidadesDisponiveis[i];
+            cidadesDisponiveis[i] = aux;
+        }
+    }    
+            
+    return melhorCidade;
 }
 
 int *criaVetorCidadesDisponiveis( int dimension ) {
