@@ -1,5 +1,5 @@
 #include"simulatedAnnealing.h"
-#define ITERACOES 5000000
+#define ITERACOES 100000
 
 Solucao *simulatedAnnealing( int **matriz, int tam ){
     Solucao *sol;
