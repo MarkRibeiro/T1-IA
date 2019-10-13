@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "algGenetico.h"
 
 /************************************
 * >>>>>>>>>>>  (Para desenvolvedores) <<<<<<<<<<<
@@ -44,6 +45,8 @@ enum Algoritmo {
     ALGORITMO_GENETICO,
     SIMULATED_ANNEALING
 };
+
+void escreveArquivo( Solucao *sol, infArq **cmds, int algoritmo );
 
 // Funcoes de algoritmo, possivelomente vamos tirar daqui
 void gulosa( infArq **cmds );

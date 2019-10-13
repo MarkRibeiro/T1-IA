@@ -1,5 +1,4 @@
 #include "main.h"
-#include "algGenetico.h"
 
 int main( int argc, char *argv[ ] ) {
     FILE *f;
@@ -70,9 +69,27 @@ int main( int argc, char *argv[ ] ) {
         }
         printf("\n");
     }
+    escreveArquivo( sol, &cmds, algoritmo );
     free(sol);
     fclose(f);
     return 0;
+}
+
+void escreveArquivo( Solucao *sol, infArq **cmds, int algoritmo ) {
+    FILE *fp =  fopen( "arquivo_saida.txt", "w+");
+       
+    fprintf(fp, "Arquivo de de entrada: %s\n", (*cmds)->name);
+    if( algoritmo == ALGORITMO_GENETICO ) {
+        fprintf(fp, "Algoritmo: algoritmo genetico\n");
+    } else {
+        fprintf(fp, "Algoritmo: simulated annealing\n");
+    }
+    fprintf(fp, "== Solucao ==\ntempo: %f s\ndistancia: %d\ncaminhos: ", sol->tempo, sol->distancia);
+    for( int i = 0; i < (*cmds)->dimension; i++ ) {
+        fprintf(fp," %d ", sol[0].cidades[i]);
+    }
+    fprintf(fp,"\n\nAlgoritmo de Mark e Felipe");
+    fclose(fp);
 }
 
  

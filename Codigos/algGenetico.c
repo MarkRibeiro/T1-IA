@@ -5,13 +5,18 @@
 #include <time.h> 
 
 Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
-    int tamPopulacao = 1000;
+    int tamPopulacao = 10;
     Solucao *sol = populacaoInicial( dimension, edgeSection, tamPopulacao );
     Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
     melhor->cidades = (int*)malloc(sizeof(int)*dimension);
     int cont = 0;
     melhor->distancia = 9999999;
-    while( cont < 999999 ) {
+    
+    clock_t iniciaTempo; //variavel responcavel pelo inicio da contagem do tempo
+    clock_t tempoMelhor; //variavel responsavel pelo fim da contagem do tempo
+    
+    iniciaTempo = clock(); //pega o tempo antes de começar o codigo
+    while( cont < 9999 ) {
         int *paisIndx = buscaMelhoresFitness( sol, tamPopulacao );
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
@@ -21,16 +26,24 @@ Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
         sol[indxP1].distancia = calculaDistancia(sol[indxP1].cidades, edgeSection, dimension);
         sol[indxP2].distancia = calculaDistancia(sol[indxP2].cidades, edgeSection, dimension);
         if( melhor->distancia > sol[indxP1].distancia ) {
+            tempoMelhor = clock(); //pega o tempo quando achar o melhor caso
             melhor->distancia = sol[indxP1].distancia;
             printf("\nDistancia: %d\n", melhor->distancia);
             copiaVetor(melhor->cidades, sol[indxP1].cidades, dimension);
             melhor->distancia = calculaDistancia( melhor->cidades, edgeSection, dimension);
+            melhor->tempo = ((double) (tempoMelhor - iniciaTempo)) / CLOCKS_PER_SEC;
+            printf("Melhor: %d ", melhor->distancia);
+            printf("em %.2fs\n", melhor->tempo);
         }
         if( melhor->distancia > sol[indxP2].distancia ) {
+            tempoMelhor = clock(); //pega o tempo quando achar o melhor caso
             melhor->distancia = sol[indxP2].distancia;
             printf("\nDistancia: %d\n", melhor->distancia);
             copiaVetor(melhor->cidades, sol[indxP2].cidades, dimension);
             melhor->distancia = calculaDistancia( melhor->cidades, edgeSection, dimension);
+            melhor->tempo = ((double) (tempoMelhor - iniciaTempo)) / CLOCKS_PER_SEC;
+            printf("Melhor: %d ", melhor->distancia);
+            printf("em %.2fs\n", melhor->tempo);
         }
         cont++;
     }
@@ -43,7 +56,7 @@ double fitnessFunction( int distancia ) {
 
 void crossover( int *p1, int *p2, int dimension ) {  
     srand(time(0));
-    int crossoverPoint = rand() % dimension;
+    int crossoverPoint = rand() % dimension/5;
     int *intervaloP1 = (int*)malloc(sizeof(int)*crossoverPoint);
     int *intervaloP2 = (int*)malloc(sizeof(int)*crossoverPoint);
     for( int i = 0; i < crossoverPoint; i++ ) {
