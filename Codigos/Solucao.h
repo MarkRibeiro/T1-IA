@@ -1,6 +1,7 @@
 struct solucao {
     int *cidades;
     int distancia;
+    double tempo;
 }; typedef struct solucao Solucao;
 
 

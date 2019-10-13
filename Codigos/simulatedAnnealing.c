@@ -1,33 +1,5 @@
 #include"simulatedAnnealing.h"
-int timer = 0;
-
-void alarm_handler(int signum) {
-    timer++;
-    alarm(1);
-}
-
-int jaPassou(int cidade, int *vetor, int tam){
-    for(int i=0;i<tam;i++){
-        if(vetor[i] == cidade)
-            return 1; //ja pasosu
-    } 
-    return 0;//Não passou
-}
-
-int getMenorCaminho(int **matriz, int cidadeAtual, int *v, int tam){    
-    int menor = 9999;
-    int cidade;
-    int aux = 0;
-
-    for(;aux<tam;aux++){
-        if(menor>matriz[cidadeAtual][aux] && matriz[cidadeAtual][aux]!=0 && jaPassou(aux, v, tam)==0){
-            menor = matriz[cidadeAtual][aux];
-            cidade = aux;
-        }
-    }
-
-    return cidade;
-}
+#define ITERACOES 99999999
 
 Solucao *simulatedAnnealing( int **matriz, int tam ){
     Solucao *sol = (Solucao*)malloc(sizeof(Solucao));
@@ -39,14 +11,17 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
     int novoDestino;
     int novoEstadoInicial;
     int aux = 0;
-    int mult = 100/tam;
-    int cont = 0;
+    int mult = 100/tam; //Variavel responsavel pela probabilidade que o simuleted anealing tera de aceitar um caminho aleatorio
+    int cont = 0;   //Variavel responsavel pelo controle do numero de iterações
+
+    clock_t iniciaTempo; //variavel responcavel pelo inicio da contagem do tempo
+    clock_t tempoMelhor; //variavel responsavel pelo fim da contagem do tempo
     
     printf("inicio: matriz[0][1] = %d\n", matriz[0][1]);
 
-    alarm(1);
-    while(cont<99999999) {
-        iniciaVetorCidadesPercorridas (sol->cidades, tam);
+    iniciaTempo = clock(); //pega o tempo antes de começar o codigo
+    while(cont < ITERACOES) {
+        iniciaVetorCidadesPercorridas (sol->cidades, tam); 
         aux = 0;
         while(aux<tam) {
             if( aux == 0 ) {
@@ -70,15 +45,40 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
         }
         sol->distancia = somaCaminhos( matriz, sol->cidades, tam );
         if( melhor->distancia > sol->distancia || cont==0 ){
+            tempoMelhor = clock(); //pega o tempo quando achar o melhor caso
             printaCidades (sol->cidades, tam);
             copiaVetor(melhor->cidades, sol->cidades, tam);
             melhor->distancia = somaCaminhos( matriz, melhor->cidades, tam );
-            printf("Melhor: %d\n", melhor->distancia);
-            printf("em %ds\n", timer);
+            melhor->tempo = ((double) (tempoMelhor - iniciaTempo)) / CLOCKS_PER_SEC;
+            printf("Melhor: %d ", melhor->distancia);
+            printf("em %.2fs\n", melhor->tempo);
         }
         cont++;
     }
     return melhor;
+}
+
+int jaPassou(int cidade, int *vetor, int tam){
+    for(int i=0;i<tam;i++){
+        if(vetor[i] == cidade)
+            return 1; //ja pasosu
+    } 
+    return 0;//Não passou
+}
+
+int getMenorCaminho(int **matriz, int cidadeAtual, int *v, int tam){    
+    int menor = 9999;
+    int cidade;
+    int aux = 0;
+
+    for(;aux<tam;aux++){
+        if(menor>matriz[cidadeAtual][aux] && matriz[cidadeAtual][aux]!=0 && jaPassou(aux, v, tam)==0){
+            menor = matriz[cidadeAtual][aux];
+            cidade = aux;
+        }
+    }
+
+    return cidade;
 }
 
 void iniciaVetorCidadesPercorridas (int *cidadesPercorridas, int tam){
@@ -105,49 +105,9 @@ void copiaVetor(int *destino, int *origem, int tam ){
 }
 
 void printaCidades (int *cidades, int tam){
-    printf(" Cidades: ");
+    printf("Cidades: ");
     for( int i = 0; i < tam; i++ ) {
        printf(" %d ", cidades[i]);
     }
     printf("\n");
 }
-
-// int main ()
-// {
-//     int **matriz;
-//     int *cidadesPercorridas;
-//     srand(time(NULL));
-
-//     cidadesPercorridas = (int*) malloc (sizeof(int)*TAM);
-//     iniciaVetorCidadesPercorridas(cidadesPercorridas, TAM);
-
-//     matriz = (int**) malloc (sizeof(int*)*TAM);
-//     matriz[0] = (int*) malloc (sizeof(int)*TAM);
-//     matriz[1] = (int*) malloc (sizeof(int)*TAM);
-//     matriz[2] = (int*) malloc (sizeof(int)*TAM);
-//     matriz[3] = (int*) malloc (sizeof(int)*TAM);
-
-//     /**/matriz[0][0] = 0;
-//         matriz[0][1] = 2;
-//         matriz[0][2] = 3;
-//         matriz[0][3] = 1;
-
-//         matriz[1][0] = 3;
-//     /**/matriz[1][1] = 0;
-//         matriz[1][2] = 2;
-//         matriz[1][3] = 1;
-
-//         matriz[2][0] = 2;
-//         matriz[2][1] = 2;
-//     /**/matriz[2][2] = 0;
-//         matriz[2][3] = 2;
-
-//         matriz[3][0] = 1;
-//         matriz[3][1] = 1;
-//         matriz[3][2] = 2;
-//     /**/matriz[3][3] = 0;
-
-//     Solucao *sol = simulatedAnnealing( matriz, TAM );
-//     printf("total: %d\n", sol->distancia);
-
-// }

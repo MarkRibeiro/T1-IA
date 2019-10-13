@@ -4,7 +4,6 @@
 int main( int argc, char *argv[ ] ) {
     FILE *f;
     int algoritmo;
-    signal(SIGALRM, alarm_handler);
     if( argc == 2 ) {
         if( (f = fopen("../Instancias/gr24.tsp", "r") ) == NULL) {
             printf("Erro na abertura do arquivo\n");
