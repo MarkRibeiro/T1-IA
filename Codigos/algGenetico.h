@@ -14,7 +14,7 @@ void organizaPorFitness( Solucao *sol, int tamPopulacao );
 
 // algoritmo de escolha de proxima cidade para criação de populacaoInicial
 int escolheCidadeAleatoria( int *cidadesDisponiveis, int tam );
-int escolheCidadeGulosa( int *cidadesDisponiveis, int cidadeAtual, int tam, int **edgeSection ); 
+int escolheCidadeGulosa( int *cidadesDisponiveis, int cidadeAtual, int tam, int **edgeSection, int dimension ); 
 
 // uteis
 int calculaDistancia( int *v, int **edgeSection, int dimension );

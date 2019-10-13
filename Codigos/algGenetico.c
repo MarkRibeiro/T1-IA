@@ -17,7 +17,7 @@ Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
     melhor->cidades = (int*)malloc(sizeof(int)*dimension);
     int cont = 0;
     melhor->distancia = 9999999;
-    while( cont < 99999 ) {
+    while( cont < 9999999 ) {
         int *paisIndx = buscaMelhoresFitness( sol, tamPopulacao );
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
@@ -173,7 +173,7 @@ Solucao *populacaoInicial( int dimension, int **edgeSection, int tamPopulacao ) 
                 sol[i].cidades[t] = escolheCidadeAleatoria( cidadesDisponiveis, tamVetorCidadesDisponiveis );
                 tamVetorCidadesDisponiveis--;
             } else {
-                sol[i].cidades[t] = escolheCidadeGulosa( cidadesDisponiveis, sol[i].cidades[t-1], tamVetorCidadesDisponiveis , edgeSection);
+                sol[i].cidades[t] = escolheCidadeGulosa( cidadesDisponiveis, sol[i].cidades[t-1], tamVetorCidadesDisponiveis , edgeSection, dimension);
                 tamVetorCidadesDisponiveis--;
             }
         }
@@ -214,17 +214,23 @@ int escolheCidadeAleatoria( int *cidadesDisponiveis, int tam ) {
 }
 
 // Gerando cidade baseada em distancia. 
-int escolheCidadeGulosa( int *cidadesDisponiveis, int cidadeAtual, int tam, int **edgeSection ) {  
+int escolheCidadeGulosa( int *cidadesDisponiveis, int cidadeAtual, int tam, int **edgeSection, int dimension ) {  
     int aux;
     int melhor = 99999;
     int melhorCidade = 0;
-    for( int i = 0; i < tam; i++ ) {
+    int melhorCidadeIndx = 0;
+    for( int i = 0; i < dimension; i++ ) {
         if( melhor > edgeSection[cidadeAtual][i] && cidadeAtual != i) {
-            melhor = edgeSection[cidadeAtual][i];
-            melhorCidade = i;
+            for( int j = 0; j < tam; j++ ) {
+                if( cidadesDisponiveis[j] == i ) {
+                    melhor = edgeSection[cidadeAtual][i];
+                    melhorCidadeIndx = j;
+                    melhorCidade = i;
+                }
+            }
         }
     }
-    cidadesDisponiveis[melhorCidade] = -1;
+    cidadesDisponiveis[melhorCidadeIndx] = -1;
     for( int i = 0; i < tam-1; i++ ) {
         if( cidadesDisponiveis[i] == -1) {
             aux = cidadesDisponiveis[i+1];
