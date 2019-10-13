@@ -3,21 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h> 
-//#include <unistd.h>
 
 Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
-    //int *v = (int*)malloc(sizeof(int)*dimension);
-//     for(int i = 0; i < dimension; i++) {
-//         v[i] = i;
-//         distancia = distancia + i;
-//     }
-    int tamPopulacao = 100;
+    int tamPopulacao = 1000;
     Solucao *sol = populacaoInicial( dimension, edgeSection, tamPopulacao );
     Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
     melhor->cidades = (int*)malloc(sizeof(int)*dimension);
     int cont = 0;
     melhor->distancia = 9999999;
-    while( cont < 9999999 ) {
+    while( cont < 999999 ) {
         int *paisIndx = buscaMelhoresFitness( sol, tamPopulacao );
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
@@ -49,31 +43,13 @@ double fitnessFunction( int distancia ) {
 
 void crossover( int *p1, int *p2, int dimension ) {  
     srand(time(0));
-    int crossoverPoint = rand() % dimension/5;
+    int crossoverPoint = rand() % dimension;
     int *intervaloP1 = (int*)malloc(sizeof(int)*crossoverPoint);
     int *intervaloP2 = (int*)malloc(sizeof(int)*crossoverPoint);
     for( int i = 0; i < crossoverPoint; i++ ) {
         intervaloP1[i] =  p1[i];
         intervaloP2[i] =  p2[i];
     }
-//     printf("Iniciando crossover( crossoverPoint = %d)\n", crossoverPoint);
-//     printf("p1: ");
-//     for( int t = 0; t < dimension; t++ ) {
-//         printf("%d ", p1[t]); 
-//     }
-//     printf("\nIntervalorP1: ");
-//     for( int i = 0; i < crossoverPoint; i++ ) {
-//         printf("%d ", intervaloP1[i]);
-//     }
-//     printf("\np2: ");
-//     for( int t = 0; t < dimension; t++ ) {
-//         printf("%d ", p2[t]); 
-//     }
-//     printf("\nIntervalorP2: ");
-//     for( int i = 0; i < crossoverPoint; i++ ) {
-//         printf("%d ", intervaloP2[i]);
-//     }
-//     printf("\n\n\n");
     for( int i = 0; i < crossoverPoint; i++ ) {
         for( int t = 0; t < dimension; t++ ) {
             if( p1[t] == intervaloP2[i] ) {
@@ -89,7 +65,7 @@ void crossover( int *p1, int *p2, int dimension ) {
     free(intervaloP1);
     free(intervaloP2);
 }
-// Reverse Sequence Mutation
+
 void mutacao( int *p1, int dimension ) {
     srand(time(0));
     int mutationPoint1 = rand() % (dimension/2);
@@ -117,19 +93,8 @@ void organizaPorFitness( Solucao *sol, int tamPopulacao ) {
             }
         }
     }
-//     for( int t = 0; t < tamPopulacao; t++ ) {
-//         printf("Solucao:\n=>distancia: %d\n=>cidades:", sol[t].distancia);
-//         for( int i = 0; i < 24; i++ ) {
-//             printf(" %d ", sol[t].cidades[i]);
-//         }
-//         printf("\n------------\n");
-//     }
 }
 
-// Aqui iremos escolher os pais. Utilizamos o valor do fitness como parametro para
-// tomar a melhor escolha, dado maior probabidalide de escolha para os pais que 
-// tem um melhor fitness, mas não retirando a possibilidade fitness mais baixos
-// aparecerem
 int *buscaMelhoresFitness( Solucao *sol, int tamPopulacao ) {
     int *melhorFitness = (int*)malloc(sizeof(int)*2);
     organizaPorFitness(sol, tamPopulacao); // organiza por fitness
