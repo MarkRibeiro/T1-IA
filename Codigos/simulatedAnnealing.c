@@ -1,28 +1,34 @@
 #include"simulatedAnnealing.h"
-#define ITERACOES 99999999
+#define ITERACOES 5000000
 
 Solucao *simulatedAnnealing( int **matriz, int tam ){
-    Solucao *sol = (Solucao*)malloc(sizeof(Solucao));
-    Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
-    sol->cidades = (int*)malloc(sizeof(int)*tam);
-    melhor->cidades = (int*)malloc(sizeof(int)*tam);
+    Solucao *sol;
+    Solucao *melhor;
 
     int dado;
     int novoDestino;
     int novoEstadoInicial;
-    int aux = 0;
-    int mult = 100/tam; //Variavel responsavel pela probabilidade que o simuleted anealing tera de aceitar um caminho aleatorio
-    int cont = 0;   //Variavel responsavel pelo controle do numero de iterações
+    int aux;
+    int mult; //Variavel responsavel pela probabilidade que o simuleted anealing tera de aceitar um caminho aleatorio
+    int cont;   //Variavel responsavel pelo controle do numero de iterações
 
     clock_t iniciaTempo; //variavel responcavel pelo inicio da contagem do tempo
     clock_t tempoMelhor; //variavel responsavel pelo fim da contagem do tempo
-    
-    printf("inicio: matriz[0][1] = %d\n", matriz[0][1]);
+
+    sol = (Solucao*)malloc(sizeof(Solucao));
+    sol->cidades = (int*)malloc(sizeof(int)*tam);
+    melhor = (Solucao*)malloc(sizeof(Solucao));
+    melhor->cidades = (int*)malloc(sizeof(int)*tam);
+
+    cont = 0;
+    mult = 100/tam;
 
     iniciaTempo = clock(); //pega o tempo antes de começar o codigo
+
     while(cont < ITERACOES) {
-        iniciaVetorCidadesPercorridas (sol->cidades, tam); 
+        iniciaVetorCidadesPercorridas (sol->cidades, tam);
         aux = 0;
+
         while(aux<tam) {
             if( aux == 0 ) {
                 novoEstadoInicial = rand() % tam;
@@ -30,31 +36,42 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
                 aux++;
                 continue;
             }
+
             srand(time(0));
             dado = rand() % 100;
-            if(dado<=mult*(tam-aux)){
+
+            if(dado<=mult*(tam-aux)){ //caso o valor aleatorio for menor ou igual a mult*(tam-aux) o algoritmo tera liberdade para escolher uma cidade aleatoria
                 novoDestino = rand() % tam;
+
                 while(jaPassou(novoDestino, sol->cidades, tam)==1){
                     novoDestino = rand() % tam;
                 }
-            }else{
+            }else{ //caso contrario o algoritmo escolhera a cidade de menor custo
                 novoDestino = getMenorCaminho(matriz, sol->cidades[aux-1], sol->cidades, tam);
             }
+
             sol->cidades[aux] = novoDestino;
             aux++;
         }
+
         sol->distancia = somaCaminhos( matriz, sol->cidades, tam );
-        if( melhor->distancia > sol->distancia || cont==0 ){
+
+        if( melhor->distancia > sol->distancia || cont==0 ){ //caso a melhor distancia for maior que a distancia atual uma nova melhor distancia foi encontrada
             tempoMelhor = clock(); //pega o tempo quando achar o melhor caso
-            printaCidades (sol->cidades, tam);
+
             copiaVetor(melhor->cidades, sol->cidades, tam);
             melhor->distancia = somaCaminhos( matriz, melhor->cidades, tam );
             melhor->tempo = ((double) (tempoMelhor - iniciaTempo)) / CLOCKS_PER_SEC;
+
+            printaCidades (melhor->cidades, tam);
             printf("Melhor: %d ", melhor->distancia);
             printf("em %.2fs\n", melhor->tempo);
         }
+
         cont++;
     }
+    tempoMelhor = clock();
+    printf("Fim: %.2fs\n", ((double) (tempoMelhor - iniciaTempo)) / CLOCKS_PER_SEC);
     return melhor;
 }
 
