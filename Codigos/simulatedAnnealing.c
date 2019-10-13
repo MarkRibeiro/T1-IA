@@ -41,10 +41,14 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
     int aux = 0;
     int mult = 100/tam;
     int cont = 0;
+
+    clock_t iniciaTempo; //variavel responcavel pelo inicio da contagem do tempo
+    clock_t tempoMelhor; //variavel responsavel pelo fim da contagem do tempo
     
     printf("inicio: matriz[0][1] = %d\n", matriz[0][1]);
 
     alarm(1);
+    iniciaTempo = clock(); //pega o tempo antes de começar o codigo
     while(cont<99999999) {
         iniciaVetorCidadesPercorridas (sol->cidades, tam);
         aux = 0;
@@ -70,11 +74,13 @@ Solucao *simulatedAnnealing( int **matriz, int tam ){
         }
         sol->distancia = somaCaminhos( matriz, sol->cidades, tam );
         if( melhor->distancia > sol->distancia || cont==0 ){
+            tempoMelhor = clock(); //pega o tempo quando achar o melhor caso
             printaCidades (sol->cidades, tam);
             copiaVetor(melhor->cidades, sol->cidades, tam);
             melhor->distancia = somaCaminhos( matriz, melhor->cidades, tam );
-            printf("Melhor: %d\n", melhor->distancia);
-            printf("em %ds\n", timer);
+            melhor->tempo = ((double) (tempoMelhor - iniciaTempo)) / CLOCKS_PER_SEC;
+            printf("Melhor: %d ", melhor->distancia);
+            printf("em %.2fs\n", melhor->tempo);
         }
         cont++;
     }
@@ -105,7 +111,7 @@ void copiaVetor(int *destino, int *origem, int tam ){
 }
 
 void printaCidades (int *cidades, int tam){
-    printf(" Cidades: ");
+    printf("Cidades: ");
     for( int i = 0; i < tam; i++ ) {
        printf(" %d ", cidades[i]);
     }
