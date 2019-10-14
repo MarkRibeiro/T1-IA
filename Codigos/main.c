@@ -30,7 +30,6 @@ int main( int argc, char *argv[ ] ) {
             algoritmo = SIMULATED_ANNEALING;
         }
     }
-    //printf("algoritmo inserido: %d\n", algoritmo);
     // Alocando estrutura com infos do arq inserido
     infArq *cmds;
     cmds =  (infArq*) malloc(sizeof(infArq));
@@ -50,8 +49,6 @@ int main( int argc, char *argv[ ] ) {
     //Atribuindo infos do arquivo
     atribuindoInfosArquivo(&cmds, f);
     // Imprimir Dados de estrutura
-//  printaInfoArquivo(&cmds);
-//  gulosa(&cmds);
     Solucao *sol;
     if( algoritmo == ALGORITMO_GENETICO ) {
         sol = algoritmoGenetico(cmds->edgeSection, cmds->dimension );
@@ -280,45 +277,45 @@ void completaMatriz( int ***edgeSection, char *edgeFormat, int dimension ) {
     }
 }
 
-void gulosa( infArq **cmds )
-{
-    int cidadeOrigem = 0;
-    int vetAux[(*cmds)->dimension];
-    int total = 0;
-    int cidadeDestino =1;
-    int count = 0;
-    int menor = (*cmds)->edgeSection[cidadeOrigem][cidadeDestino];
-    
-    for(int i=0; i<(*cmds)->dimension;i++)
-    {
-        vetAux[i]=(*cmds)->edgeSection[i][cidadeOrigem];
-        (*cmds)->edgeSection[i][cidadeOrigem] = 0;
-    }
-    
-    while(count<(*cmds)->dimension-1)
-    {
-        for(int aux=0;aux<(*cmds)->dimension;aux++)
-        {
-            if((*cmds)->edgeSection[cidadeOrigem][aux]<menor && (*cmds)->edgeSection[cidadeOrigem][aux]!=0)
-            {
-                cidadeDestino = aux;
-                menor = (*cmds)->edgeSection[cidadeOrigem][aux];
-            }
-        }
-        //ao final
-        total = total + menor;
-         printf("cidade origem: %d cidade destino: %d gasto: %d\n", cidadeOrigem, cidadeDestino, menor);
-        cidadeOrigem = cidadeDestino;
-        cidadeDestino = 0;
-        menor = 9999;//Tem que arrumar isso aqui 
-        for(int i=0; i<(*cmds)->dimension;i++)
-        {
-            (*cmds)->edgeSection[i][cidadeOrigem] = 0;
-        }
-        count++;
-        }
-    total = total + vetAux[cidadeOrigem];
-    printf("****\n");
-    printf("%d\n", total);
-    printf("****\n");
-}
+// void gulosa( infArq **cmds )
+// {
+//     int cidadeOrigem = 0;
+//     int vetAux[(*cmds)->dimension];
+//     int total = 0;
+//     int cidadeDestino =1;
+//     int count = 0;
+//     int menor = (*cmds)->edgeSection[cidadeOrigem][cidadeDestino];
+//     
+//     for(int i=0; i<(*cmds)->dimension;i++)
+//     {
+//         vetAux[i]=(*cmds)->edgeSection[i][cidadeOrigem];
+//         (*cmds)->edgeSection[i][cidadeOrigem] = 0;
+//     }
+//     
+//     while(count<(*cmds)->dimension-1)
+//     {
+//         for(int aux=0;aux<(*cmds)->dimension;aux++)
+//         {
+//             if((*cmds)->edgeSection[cidadeOrigem][aux]<menor && (*cmds)->edgeSection[cidadeOrigem][aux]!=0)
+//             {
+//                 cidadeDestino = aux;
+//                 menor = (*cmds)->edgeSection[cidadeOrigem][aux];
+//             }
+//         }
+//         ao final
+//         total = total + menor;
+//          printf("cidade origem: %d cidade destino: %d gasto: %d\n", cidadeOrigem, cidadeDestino, menor);
+//         cidadeOrigem = cidadeDestino;
+//         cidadeDestino = 0;
+//         menor = 9999;//Tem que arrumar isso aqui 
+//         for(int i=0; i<(*cmds)->dimension;i++)
+//         {
+//             (*cmds)->edgeSection[i][cidadeOrigem] = 0;
+//         }
+//         count++;
+//         }
+//     total = total + vetAux[cidadeOrigem];
+//     printf("****\n");
+//     printf("%d\n", total);
+//     printf("****\n");
+// }
