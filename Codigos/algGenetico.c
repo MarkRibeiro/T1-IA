@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <time.h> 
 
-#define ITERACOES 99999999
-
+#define ITERACOES 500000
+                  
 Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
-    int tamPopulacao = 100;
+    int tamPopulacao = 500;
     Solucao *sol = populacaoInicial( dimension, edgeSection, tamPopulacao );
     Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
     melhor->cidades = (int*)malloc(sizeof(int)*dimension);
