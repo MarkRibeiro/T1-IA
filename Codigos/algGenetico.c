@@ -23,9 +23,6 @@ Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
         crossover( sol[indxP1].cidades, sol[indxP2].cidades, dimension);
-//         for(int i = 0; i < tamPopulacao; i++ ) {
-//             mutacao( sol[i].cidades, dimension );
-//         }
         mutacao( sol[indxP1].cidades, dimension, edgeSection );
         mutacao( sol[indxP2].cidades, dimension, edgeSection );
         sol[indxP1].distancia = calculaDistancia(sol[indxP1].cidades, edgeSection, dimension);
@@ -191,15 +188,13 @@ Solucao *populacaoInicial( int dimension, int **edgeSection, int tamPopulacao ) 
             }
         }
         sol[i].distancia = calculaDistancia( sol[i].cidades, edgeSection, dimension );
-        //sleep(1);
     }
     return sol;
 }
 
 int calculaDistancia( int *v, int **edgeSection, int dimension ) {
     int distancia = 0;
-    for( int i = 0; i+1 < dimension; i++ ) {
-        //printf("edgeSection[%d][%d] = %d\n", v[i], v[i+1], edgeSection[v[i]][v[i+1]]); 
+    for( int i = 0; i+1 < dimension; i++ ) { 
         distancia += edgeSection[v[i]][v[i+1]];
     }
     distancia+= edgeSection[v[0]][v[dimension-1]];
