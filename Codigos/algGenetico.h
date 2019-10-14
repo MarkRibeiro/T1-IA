@@ -47,14 +47,17 @@ Solucao *populacaoInicial( int dimension, int **edgeSection, int tamPopulacao );
 *  Responsável pela mutação dos cromossomos da população.
 * 
 *  método:
-*       Geramos um número x que representa uma posição aleatoria e 
+*       Dois tipos de mutação diferente:
+*       1)Geramos um número x que representa uma posição aleatoria e 
 *       no intervalo [ x , dimension - x ] e invertemos esse intervalo
 *       no intuito de efetuar uma mutação e evitar maximos locais.
+*       2)Geramos um intervalo aleatorio no e reorganizamos esse intervalo de uma maneira
+*       que segue o algoritmo guloso.
 * 
 *  Parametros:
 *       int *p1 -> ponteiro para vetor que representa um cromossomo da população para sofrer mutação
 *       int dimesion -> inteiro que representa o número de elementos em p1
-* 
+*       int **edgeSection -> matriz que armazena as distancias de cada cidade para cada cidade
 */
 
 void mutacao( int *p1, int dimension, int **edgeSection );
@@ -69,8 +72,8 @@ void mutacao( int *p1, int dimension, int **edgeSection );
 * 
 *  Parametros:
 *       int *p1 -> ponteiro para vetor 1 que representa um cromossomo da população para sofrerá crossover
+*       int *p2 -> ponteiro para vetor 2 que representa um cromossomo da população para sofrerá crossover
 *       int dimesion -> inteiro que representa o número de elementos em p1 e p2       
-*       int **edgeSection -> matriz que armazena as distancias de cada cidade para cada cidade
 */
 
 void crossover( int *p1, int *p2, int dimension );
