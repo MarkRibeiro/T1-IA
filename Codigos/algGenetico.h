@@ -57,7 +57,7 @@ Solucao *populacaoInicial( int dimension, int **edgeSection, int tamPopulacao );
 * 
 */
 
-void mutacao( int *p1, int dimension );
+void mutacao( int *p1, int dimension, int **edgeSection );
 
 /* 
 * crossover
@@ -69,9 +69,8 @@ void mutacao( int *p1, int dimension );
 * 
 *  Parametros:
 *       int *p1 -> ponteiro para vetor 1 que representa um cromossomo da população para sofrerá crossover
-*       int *p2 -> ponteiro para vetor 2 que representa um cromossomo da população para sofrerá crossover
 *       int dimesion -> inteiro que representa o número de elementos em p1 e p2       
-* 
+*       int **edgeSection -> matriz que armazena as distancias de cada cidade para cada cidade
 */
 
 void crossover( int *p1, int *p2, int dimension );

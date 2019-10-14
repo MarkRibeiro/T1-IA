@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <time.h> 
 
+#define ITERACOES 99999999
+
 Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
-    int tamPopulacao = 10;
+    int tamPopulacao = 100;
     Solucao *sol = populacaoInicial( dimension, edgeSection, tamPopulacao );
     Solucao *melhor = (Solucao*)malloc(sizeof(Solucao));
     melhor->cidades = (int*)malloc(sizeof(int)*dimension);
@@ -16,13 +18,16 @@ Solucao *algoritmoGenetico( int **edgeSection, int dimension ) {
     clock_t tempoMelhor; //variavel responsavel pelo fim da contagem do tempo
     
     iniciaTempo = clock(); //pega o tempo antes de começar o codigo
-    while( cont < 9999 ) {
+    while( cont < ITERACOES ) {
         int *paisIndx = buscaMelhoresFitness( sol, tamPopulacao );
         int indxP1 = paisIndx[0];
         int indxP2 = paisIndx[1];
         crossover( sol[indxP1].cidades, sol[indxP2].cidades, dimension);
-        mutacao( sol[indxP1].cidades, dimension );
-        mutacao( sol[indxP2].cidades, dimension );
+//         for(int i = 0; i < tamPopulacao; i++ ) {
+//             mutacao( sol[i].cidades, dimension );
+//         }
+        mutacao( sol[indxP1].cidades, dimension, edgeSection );
+        mutacao( sol[indxP2].cidades, dimension, edgeSection );
         sol[indxP1].distancia = calculaDistancia(sol[indxP1].cidades, edgeSection, dimension);
         sol[indxP2].distancia = calculaDistancia(sol[indxP2].cidades, edgeSection, dimension);
         if( melhor->distancia > sol[indxP1].distancia ) {
@@ -56,6 +61,7 @@ double fitnessFunction( int distancia ) {
 
 void crossover( int *p1, int *p2, int dimension ) {  
     srand(time(0));
+    
     int crossoverPoint = rand() % dimension/5;
     int *intervaloP1 = (int*)malloc(sizeof(int)*crossoverPoint);
     int *intervaloP2 = (int*)malloc(sizeof(int)*crossoverPoint);
@@ -79,20 +85,49 @@ void crossover( int *p1, int *p2, int dimension ) {
     free(intervaloP2);
 }
 
-void mutacao( int *p1, int dimension ) {
+void mutacao( int *p1, int dimension, int **edgeSection ) {
     srand(time(0));
-    int mutationPoint1 = rand() % (dimension/2);
-    int mutationPoint2 = (dimension-1) - mutationPoint1;
-    int auxMutation1 = mutationPoint1;
-    int auxMutation2 = mutationPoint2;
-    for( int i = 0; i <= (mutationPoint2 - mutationPoint1)/2 ; i++ ) {
-        int aux = p1[auxMutation1];
-        p1[auxMutation1] = p1[auxMutation2];
-        p1[auxMutation2] = aux;
-        auxMutation1++;
-        auxMutation2--;
+    int dado = rand() % 100;
+    int mutationPoint1;
+    int mutationPoint2;
+    if( dado > 50 ) {
+        mutationPoint1 = rand() % (dimension/2);
+        mutationPoint2 = (dimension-1) - mutationPoint1;
+        int auxMutation1 = mutationPoint1;
+        int auxMutation2 = mutationPoint2;
+        for( int i = 0; i <= (mutationPoint2 - mutationPoint1)/2 ; i++ ) {
+            int aux = p1[auxMutation1];
+            p1[auxMutation1] = p1[auxMutation2];
+            p1[auxMutation2] = aux;
+            auxMutation1++;
+            auxMutation2--;
+        }
+    } else {
+        mutationPoint1 = rand() % dimension;
+        srand(mutationPoint1);
+        mutationPoint2 = rand() % dimension;
+        int aux;
+        if( mutationPoint1 > mutationPoint2 ) {
+            aux = mutationPoint1;
+            mutationPoint1 = mutationPoint2;
+            mutationPoint2 = aux;
+        }
+        int tam = mutationPoint2 - mutationPoint1;
+        int *cidadesDisponiveis = (int*)malloc(sizeof(int)*(tam));
+        aux = 0;
+        for( int i = mutationPoint1; i < mutationPoint2; i++ ) {
+            cidadesDisponiveis[aux] = p1[i];
+            aux++;
+        }
+        int cidadeAtual = mutationPoint1 - 1;
+        if( cidadeAtual < 0 )
+            cidadeAtual = 0;
+        for( int i = mutationPoint1; i < mutationPoint2; i++ ) {
+            p1[i] = escolheCidadeGulosa( cidadesDisponiveis, cidadeAtual, tam, edgeSection, dimension );
+            tam--;
+            cidadeAtual = p1[i];
+        }
     }
-
 }
 
 void organizaPorFitness( Solucao *sol, int tamPopulacao ) {
